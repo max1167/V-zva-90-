@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="90 DNÍ">
+<meta name="theme-color" content="#060612">
+<title>90 DNÍ</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #060612;
+  --s1:      rgba(255,255,255,0.04);
+  --s2:      rgba(255,255,255,0.07);
+  --b1:      rgba(120,160,255,0.10);
+  --b2:      rgba(120,160,255,0.22);
+  --cyan:    #00eeff;
+  --blue:    #3b7eff;
+  --purple:  #a855f7;
+  --green:   #00ff88;
+  --red:     #ff3366;
+  --orange:  #ff7043;
+  --gold:    #ffcc00;
+  --sport:   #ff7043;
+  --prace:   #3b7eff;
+  --self:    #a855f7;
+  --t1:      #eef0ff;
+  --t2:      #8890bb;
+  --t3:      #40486a;
+  --sans:    'Inter', sans-serif;
+  --hud:     'Orbitron', monospace;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { height:100%; }
+body { background:var(--bg); color:var(--t1); font-family:var(--sans); overflow-x:hidden; }
+
+/* ── BACKGROUND ── */
+.bg {
+  position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;
+}
+.bg::before {
+  content:'';
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(59,126,255,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,126,255,0.035) 1px, transparent 1px);
+  background-size:44px 44px;
+}
+.bg::after {
+  content:'';
+  position:absolute; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,238,255,0.12),transparent);
+  animation:scan 7s linear infinite;
+}
+@keyframes scan { from{top:-1px} to{top:100vh} }
+.orb { position:absolute; border-radius:50%; filter:blur(90px); opacity:.1; }
+.o1 { width:500px;height:500px;background:radial-gradient(#3b7eff,transparent);top:-150px;left:-150px;animation:d1 14s ease-in-out infinite alternate; }
+.o2 { width:350px;height:350px;background:radial-gradient(#a855f7,transparent);bottom:-80px;right:-80px;animation:d2 11s ease-in-out infinite alternate; }
+.o3 { width:250px;height:250px;background:radial-gradient(#00eeff,transparent);top:45%;left:55%;animation:d3 8s ease-in-out infinite alternate; }
+@keyframes d1{to{transform:translate(50px,70px)}}
+@keyframes d2{to{transform:translate(-40px,-60px)}}
+@keyframes d3{to{transform:translate(-30px,40px)}}
+
+/* ── HEADER ── */
+.hdr {
+  position:sticky; top:0; z-index:100;
+  background:rgba(6,6,18,.92); backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--b1);
+  padding:13px 18px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.hdr-left {}
+.logo {
+  font-family:var(--hud); font-size:1.3rem; font-weight:900; letter-spacing:5px;
+  background:linear-gradient(90deg,var(--cyan),var(--blue),var(--purple));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.hdr-date { font-family:var(--hud); font-size:.48rem; color:var(--t3); letter-spacing:2px; margin-top:3px; }
+.ico-btn {
+  background:var(--s1); border:1px solid var(--b1); color:var(--t2);
+  width:38px; height:38px; border-radius:9px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.95rem; transition:all .2s;
+}
+.ico-btn:hover { background:var(--s2); border-color:var(--b2); color:var(--t1); }
+
+/* ── TABS ── */
+.tabs {
+  position:sticky; top:67px; z-index:99;
+  background:rgba(6,6,18,.92); backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--b1);
+  display:flex; padding:0 10px; gap:2px;
+}
+.tab {
+  flex:1; padding:11px 4px;
+  font-family:var(--hud); font-size:.52rem; font-weight:700;
+  letter-spacing:1.5px; text-transform:uppercase;
+  background:none; border:none; border-bottom:2px solid transparent;
+  color:var(--t3); cursor:pointer; transition:all .2s;
+}
+.tab.on { color:var(--cyan); border-bottom-color:var(--cyan); }
+
+/* ── WRAP ── */
+.wrap { padding:18px 16px 48px; max-width:480px; margin:0 auto; position:relative; z-index:1; }
+.panel { display:none; animation:fi .2s ease; }
+.panel.on { display:block; }
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── SETTINGS ── */
+.settings {
+  display:none; background:var(--s1); border:1px solid var(--b1);
+  border-radius:14px; padding:16px; margin-bottom:16px;
+}
+.settings.on { display:block; }
+.srow { display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--b1); font-size:.8rem; }
+.srow:last-child { border-bottom:none; }
+.skey { font-family:var(--hud); font-size:.6rem; color:var(--t2); letter-spacing:1px; }
+
+/* ── HUD CARD (progress) ── */
+.hud-card {
+  background:var(--s1); border:1px solid var(--b1);
+  border-radius:18px; padding:20px; margin-bottom:20px;
+  position:relative; overflow:hidden;
+}
+.hud-card::before,.hud-card::after {
+  content:''; position:absolute; width:18px; height:18px;
+  border-color:rgba(0,238,255,.4); border-style:solid; opacity:.6;
+}
+.hud-card::before { top:8px; left:8px; border-width:2px 0 0 2px; }
+.hud-card::after  { bottom:8px; right:8px; border-width:0 2px 2px 0; }
+
+.hud-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; }
+
+.day-block {}
+.day-lbl { font-family:var(--hud); font-size:.48rem; color:var(--t3); letter-spacing:2px; margin-bottom:4px; }
+.day-num {
+  font-family:var(--hud); font-size:4rem; font-weight:900; line-height:1;
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  filter:drop-shadow(0 0 18px rgba(0,238,255,.35));
+}
+.day-of { font-family:var(--hud); font-size:.6rem; color:var(--t3); letter-spacing:2px; margin-top:4px; }
+
+/* ring */
+.ring-wrap { position:relative; width:88px; height:88px; flex-shrink:0; }
+.ring-svg { width:100%; height:100%; transform:rotate(-90deg); }
+.ring-bg { fill:none; stroke:rgba(255,255,255,.04); stroke-width:8; }
+.ring-fill { fill:none; stroke:url(#rg); stroke-width:8; stroke-linecap:round; transition:stroke-dashoffset .8s cubic-bezier(.16,1,.3,1); }
+.ring-mid { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.ring-pct { font-family:var(--hud); font-size:1rem; font-weight:900; color:var(--cyan); line-height:1; }
+.ring-lbl { font-family:var(--hud); font-size:.38rem; color:var(--t3); letter-spacing:1px; margin-top:2px; }
+
+/* bar */
+.bar-row { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+.bar-lbl { font-family:var(--hud); font-size:.46rem; color:var(--t3); letter-spacing:1.5px; white-space:nowrap; }
+.bar-track { flex:1; height:6px; background:rgba(255,255,255,.04); border-radius:99px; overflow:visible; position:relative; }
+.bar-fill {
+  height:100%; border-radius:99px;
+  background:linear-gradient(90deg,var(--blue),var(--cyan));
+  transition:width .8s cubic-bezier(.16,1,.3,1);
+  box-shadow:0 0 10px rgba(0,238,255,.4); position:relative;
+}
+.bar-fill::after {
+  content:''; position:absolute; right:-4px; top:50%; transform:translateY(-50%);
+  width:10px; height:10px; border-radius:50%;
+  background:var(--cyan); box-shadow:0 0 8px var(--cyan);
+}
+.bar-pct { font-family:var(--hud); font-size:.55rem; color:var(--cyan); min-width:32px; text-align:right; }
+
+/* stats */
+.stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.stat {
+  background:rgba(255,255,255,.03); border:1px solid var(--b1);
+  border-radius:10px; padding:10px 8px; text-align:center; position:relative;
+}
+.stat::after { content:''; position:absolute; bottom:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--cyan),transparent); opacity:.2; }
+.sv { font-family:var(--hud); font-size:1.4rem; font-weight:900; color:var(--t1); line-height:1; }
+.sk { font-family:var(--hud); font-size:.4rem; color:var(--t3); letter-spacing:1.5px; margin-top:4px; text-transform:uppercase; }
+
+/* ── MOTIVATION CARDS ── */
+.motiv { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:24px; }
+.motiv-card {
+  border-radius:14px; padding:14px 14px 14px 16px;
+  border:1px solid var(--b1); cursor:pointer; position:relative;
+  overflow:hidden; transition:transform .15s;
+}
+.motiv-card:active { transform:scale(.98); }
+.motiv-card.reward {
+  background:linear-gradient(135deg,rgba(255,204,0,.08),rgba(255,112,67,.06));
+  border-color:rgba(255,204,0,.25);
+}
+.motiv-card.punish {
+  background:linear-gradient(135deg,rgba(255,51,102,.08),rgba(168,85,247,.06));
+  border-color:rgba(255,51,102,.25);
+}
+.motiv-card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; }
+.motiv-card.reward::before { background:linear-gradient(90deg,transparent,var(--gold),transparent); }
+.motiv-card.punish::before { background:linear-gradient(90deg,transparent,var(--red),transparent); }
+.mc-icon { font-size:1.4rem; margin-bottom:6px; display:block; }
+.mc-tag { font-family:var(--hud); font-size:.5rem; letter-spacing:2px; margin-bottom:7px; }
+.reward .mc-tag { color:var(--gold); }
+.punish .mc-tag { color:var(--red); }
+.mc-val { font-size:.78rem; color:var(--t1); line-height:1.4; word-break:break-word; font-weight:500; }
+.mc-val.empty { color:var(--t3); font-style:italic; font-size:.72rem; }
+.mc-edit { position:absolute; top:9px; right:9px; font-family:var(--hud); font-size:.46rem; color:var(--t3); background:var(--s2); border:1px solid var(--b1); border-radius:5px; padding:3px 7px; cursor:pointer; }
+
+/* ── SECTION HEADER ── */
+.sec-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.sec-title {
+  font-family:var(--hud); font-size:.55rem; text-transform:uppercase;
+  letter-spacing:2.5px; color:var(--t3);
+  display:flex; align-items:center; gap:8px;
+}
+.sec-title::before { content:''; width:12px; height:1px; background:linear-gradient(90deg,var(--cyan),transparent); display:inline-block; }
+
+/* ── DATE NAV ── */
+.date-nav { display:flex; align-items:center; gap:6px; }
+.dnav-btn {
+  background:var(--s1); border:1px solid var(--b1); color:var(--t2);
+  width:30px; height:30px; border-radius:7px; cursor:pointer;
+  font-size:.8rem; display:flex; align-items:center; justify-content:center; transition:all .15s;
+}
+.dnav-btn:hover:not(:disabled) { border-color:var(--cyan); color:var(--cyan); }
+.dnav-btn:disabled { opacity:.2; cursor:default; }
+.dnav-date { font-family:var(--hud); font-size:.58rem; color:var(--t1); letter-spacing:1px; min-width:68px; text-align:center; }
+
+/* ── CHECKLIST ── */
+.clist { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+
+.ci {
+  display:flex; align-items:center; gap:0;
+  background:var(--s1); border:1px solid var(--b1); border-radius:12px;
+  overflow:hidden; position:relative;
+}
+.ci::before {
+  content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:var(--b2); transition:background .2s, box-shadow .2s;
+}
+.ci.done { background:rgba(0,255,136,.04); border-color:rgba(0,255,136,.2); }
+.ci.done::before { background:var(--green); box-shadow:0 0 8px rgba(0,255,136,.5); }
+
+/* checkbox */
+.ci-check {
+  width:52px; min-height:58px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; flex-shrink:0;
+  border-right:1px solid var(--b1);
+}
+.ci-box {
+  width:24px; height:24px; border:1.5px solid var(--b2);
+  border-radius:6px; display:flex; align-items:center; justify-content:center;
+  font-size:.9rem; color:transparent; transition:all .2s;
+  background:rgba(255,255,255,.02);
+}
+.ci.done .ci-box {
+  border-color:var(--green); color:var(--green);
+  background:rgba(0,255,136,.12); box-shadow:0 0 10px rgba(0,255,136,.3);
+  animation:pop .25s ease;
+}
+@keyframes pop{0%{transform:scale(.7)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+
+/* content */
+.ci-body {
+  flex:1; min-width:0; padding:13px 12px; cursor:pointer;
+}
+.ci-name { font-size:.88rem; color:var(--t1); font-weight:500; }
+.ci.done .ci-name { color:var(--t3); text-decoration:line-through; }
+.ci-cat { font-family:var(--hud); font-size:.46rem; letter-spacing:2px; margin-top:3px; text-transform:uppercase; }
+.ci-reason { font-size:.68rem; color:var(--t3); margin-top:5px; font-style:italic; line-height:1.4; border-left:2px solid var(--b2); padding-left:7px; }
+.cat-sport  { color:var(--sport); }
+.cat-prace  { color:var(--prace); }
+.cat-self   { color:var(--self); }
+
+/* action buttons */
+.ci-acts { display:flex; flex-direction:column; gap:0; flex-shrink:0; border-left:1px solid var(--b1); }
+.ci-btn {
+  width:48px; height:50%; min-height:29px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:.85rem; border:none; transition:all .15s;
+}
+.ci-btn.edt { background:rgba(59,126,255,.08); color:var(--blue); border-bottom:1px solid var(--b1); }
+.ci-btn.del { background:rgba(255,51,102,.08); color:var(--red); }
+.ci-btn:active { opacity:.6; transform:scale(.93); }
+
+/* ── ADD BTN ── */
+.add-btn {
+  width:100%; padding:13px;
+  background:none; border:1.5px dashed rgba(120,160,255,.15);
+  border-radius:11px; color:var(--t3); font-family:var(--hud);
+  font-size:.54rem; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
+  cursor:pointer; transition:all .2s; margin-bottom:24px;
+}
+.add-btn:hover { border-color:var(--cyan); color:var(--cyan); background:rgba(0,238,255,.03); }
+
+/* ── JOURNAL ── */
+.jblock { margin-bottom:13px; }
+.jlbl {
+  font-family:var(--hud); font-size:.52rem; text-transform:uppercase;
+  letter-spacing:2px; font-weight:700; margin-bottom:7px;
+  display:flex; align-items:center; gap:8px;
+}
+.jlbl::before { content:''; width:14px; height:1px; display:inline-block; }
+.jlbl.win { color:var(--green); }   .jlbl.win::before { background:var(--green); box-shadow:0 0 5px var(--green); }
+.jlbl.fail { color:var(--red); }    .jlbl.fail::before { background:var(--red); box-shadow:0 0 5px var(--red); }
+.jlbl.ref { color:var(--blue); }    .jlbl.ref::before { background:var(--blue); box-shadow:0 0 5px var(--blue); }
+.jta {
+  width:100%; background:var(--s1); border:1px solid var(--b1);
+  border-radius:11px; color:var(--t1); font-family:var(--sans);
+  font-size:.85rem; padding:12px 14px; resize:none; outline:none;
+  transition:all .2s; line-height:1.65; min-height:90px;
+}
+.jta:focus { border-color:rgba(0,238,255,.25); background:var(--s2); }
+.jta::placeholder { color:var(--t3); }
+.jsave {
+  width:100%; padding:13px; margin-top:4px; margin-bottom:24px;
+  background:linear-gradient(90deg,var(--blue),var(--cyan));
+  border:none; border-radius:11px; color:var(--bg);
+  font-family:var(--hud); font-size:.58rem; font-weight:700;
+  letter-spacing:2.5px; text-transform:uppercase; cursor:pointer;
+  transition:all .2s; box-shadow:0 4px 20px rgba(0,238,255,.22);
+}
+.jsave:hover { opacity:.9; }
+.jsave:active { transform:scale(.98); }
+
+/* ── GRID ── */
+.grid90 { display:grid; grid-template-columns:repeat(10,1fr); gap:3px; margin-bottom:14px; }
+.dc {
+  aspect-ratio:1; border-radius:5px; border:1px solid rgba(120,160,255,.06);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--hud); font-size:.44rem; color:var(--t3); font-weight:700;
+}
+.dc.today { border-color:var(--cyan); color:var(--cyan); box-shadow:0 0 7px rgba(0,238,255,.3); }
+.dc.full { background:linear-gradient(135deg,rgba(0,255,136,.25),rgba(0,180,80,.15)); border-color:rgba(0,255,136,.4); color:var(--green); }
+.dc.partial { background:rgba(0,255,136,.07); border-color:rgba(0,255,136,.2); color:rgba(0,255,136,.5); }
+.dc.fail { background:rgba(255,51,102,.07); border-color:rgba(255,51,102,.2); color:rgba(255,51,102,.5); }
+.dc.future { opacity:.15; }
+
+.legend { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:24px; }
+.leg { display:flex; align-items:center; gap:5px; font-family:var(--hud); font-size:.46rem; color:var(--t3); letter-spacing:1px; }
+.ldot { width:8px; height:8px; border-radius:2px; }
+
+/* ── ARCHIVE ── */
+.arc-entry { background:var(--s1); border:1px solid var(--b1); border-radius:11px; padding:13px 14px; margin-bottom:8px; }
+.arc-day { font-family:var(--hud); font-size:.5rem; color:var(--t3); letter-spacing:2px; text-transform:uppercase; margin-bottom:9px; }
+.arc-line { font-size:.78rem; line-height:1.55; margin-bottom:4px; }
+
+/* ── MODAL ── */
+.moverlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,8,.88); backdrop-filter:blur(14px);
+  z-index:200; align-items:flex-end; justify-content:center;
+}
+.moverlay.on { display:flex; }
+.modal {
+  background:#0a0a1e; border:1px solid var(--b2); border-bottom:none;
+  border-radius:22px 22px 0 0; width:100%; max-width:480px; padding:24px 20px;
+  animation:sup .3s cubic-bezier(.16,1,.3,1); position:relative; overflow:hidden;
+}
+.modal::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--cyan),transparent); opacity:.4; }
+@keyframes sup{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.mhandle { width:36px; height:4px; background:var(--b2); border-radius:99px; margin:0 auto 20px; }
+.mtitle { font-family:var(--hud); font-size:1.1rem; font-weight:900; letter-spacing:2px; margin-bottom:20px; text-transform:uppercase; }
+.mtitle.cyan  { color:var(--cyan);   text-shadow:0 0 18px rgba(0,238,255,.35); }
+.mtitle.green { color:var(--green);  text-shadow:0 0 18px rgba(0,255,136,.35); }
+.mtitle.red   { color:var(--red);    text-shadow:0 0 18px rgba(255,51,102,.35); }
+
+.fg { margin-bottom:14px; }
+.flbl { display:block; font-family:var(--hud); font-size:.52rem; text-transform:uppercase; letter-spacing:2px; color:var(--t3); margin-bottom:7px; }
+.finput {
+  width:100%; background:var(--s1); border:1px solid var(--b1);
+  border-radius:9px; color:var(--t1); font-family:var(--sans);
+  font-size:.9rem; padding:11px 13px; outline:none; transition:all .18s;
+}
+.finput:focus { border-color:rgba(0,238,255,.28); background:var(--s2); }
+.fselect {
+  width:100%; background:var(--s1); border:1px solid var(--b1);
+  border-radius:9px; color:var(--t1); font-family:var(--sans);
+  font-size:.9rem; padding:11px 13px; outline:none; appearance:none; cursor:pointer;
+}
+.ftextarea {
+  width:100%; background:var(--s1); border:1px solid var(--b1);
+  border-radius:9px; color:var(--t1); font-family:var(--sans);
+  font-size:.88rem; padding:11px 13px; outline:none; resize:none;
+  min-height:80px; line-height:1.6; transition:all .18s;
+}
+.ftextarea:focus { border-color:rgba(0,238,255,.28); }
+.macts { display:flex; gap:10px; margin-top:20px; }
+.mbtn-p {
+  flex:1; padding:13px;
+  background:linear-gradient(90deg,var(--blue),var(--cyan));
+  border:none; border-radius:9px; color:var(--bg);
+  font-family:var(--hud); font-weight:700; font-size:.58rem;
+  letter-spacing:2.5px; text-transform:uppercase; cursor:pointer;
+  transition:all .18s; box-shadow:0 4px 16px rgba(0,238,255,.22);
+}
+.mbtn-p:hover { opacity:.9; }
+.mbtn-p:active { transform:scale(.98); }
+.mbtn-s {
+  padding:13px 16px; background:var(--s1); border:1px solid var(--b1);
+  border-radius:9px; color:var(--t2); font-family:var(--hud);
+  font-size:.58rem; letter-spacing:1.5px; cursor:pointer; transition:all .18s;
+}
+.mbtn-s:hover { background:var(--s2); border-color:var(--b2); color:var(--t1); }
+
+/* ── EMPTY ── */
+.empty {
+  text-align:center; padding:30px 16px;
+  color:var(--t3); font-family:var(--hud); font-size:.54rem; letter-spacing:2px;
+  border:1.5px dashed rgba(120,160,255,.08); border-radius:13px; margin-bottom:8px;
+}
+.eico { font-size:1.8rem; margin-bottom:9px; opacity:.3; display:block; }
+
+/* ── TOAST ── */
+.toast {
+  position:fixed; bottom:28px; left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:linear-gradient(90deg,var(--blue),var(--cyan));
+  color:var(--bg); padding:11px 22px; border-radius:99px;
+  font-family:var(--hud); font-size:.58rem; font-weight:700; letter-spacing:2px;
+  transition:transform .35s cubic-bezier(.16,1,.3,1); z-index:300; white-space:nowrap;
+  box-shadow:0 8px 24px rgba(0,238,255,.3);
+}
+.toast.on { transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="bg">
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+  <div class="orb o3"></div>
+</div>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3b7eff"/>
+      <stop offset="100%" stop-color="#00eeff"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-left">
+    <div class="logo">90 DNÍ</div>
+    <div class="hdr-date" id="hdr-date">...</div>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <button class="ico-btn" id="set-btn">⚙</button>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab on"  onclick="tab('dnes')">DNES</button>
+  <button class="tab"     onclick="tab('navyky')">NÁVYKY</button>
+  <button class="tab"     onclick="tab('log')">LOG</button>
+  <button class="tab"     onclick="tab('prehled')">HUD</button>
+</div>
+
+<div class="wrap">
+
+  <!-- SETTINGS -->
+  <div class="settings" id="settings">
+    <div class="srow">
+      <span class="skey">DATUM STARTU</span>
+      <input type="date" class="finput" id="start-inp" style="width:auto;padding:7px 11px;font-size:.75rem;border-radius:8px;">
+    </div>
+    <div class="srow" style="padding-top:12px;">
+      <button class="mbtn-s" style="width:100%;font-size:.52rem;letter-spacing:2px;" onclick="resetAll()">⚠ RESET VŠEHO</button>
+    </div>
+  </div>
+
+  <!-- ══ TAB: DNES ══ -->
+  <div class="panel on" id="panel-dnes">
+
+    <!-- HUD progress -->
+    <div class="hud-card">
+      <div class="hud-top">
+        <div class="day-block">
+          <div class="day-lbl">AKTUÁLNÍ DEN</div>
+          <div class="day-num" id="day-num">01</div>
+          <div class="day-of">/ 090 DNÍ</div>
+        </div>
+        <div class="ring-wrap">
+          <svg class="ring-svg" viewBox="0 0 90 90">
+            <circle class="ring-bg" cx="45" cy="45" r="38"/>
+            <circle class="ring-fill" id="ring-fill" cx="45" cy="45" r="38"
+              stroke-dasharray="238.76" stroke-dashoffset="238.76"/>
+          </svg>
+          <div class="ring-mid">
+            <div class="ring-pct" id="ring-pct">0%</div>
+            <div class="ring-lbl">SPLNĚNO</div>
+          </div>
+        </div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-lbl">VÝZVA</div>
+        <div class="bar-track"><div class="bar-fill" id="bar-fill" style="width:0%"></div></div>
+        <div class="bar-pct" id="bar-pct">0%</div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="sv" id="st-streak">0</div><div class="sk">STREAK 🔥</div></div>
+        <div class="stat"><div class="sv" id="st-perf">0</div><div class="sk">PERF. DNY</div></div>
+        <div class="stat"><div class="sv" id="st-rem">90</div><div class="sk">ZBÝVÁ</div></div>
+      </div>
+    </div>
+
+    <!-- Desatero -->
+    <div class="sec-hdr"><div class="sec-title">CO DĚLÁM KAŽDÝ DEN</div></div>
+    <div id="rules-do" class="rules-block"></div>
+
+    <div class="sec-hdr"><div class="sec-title">CO NESMÍM</div></div>
+    <div id="rules-dont" class="rules-block"></div>
+
+    <!-- Motivace -->
+    <div class="sec-hdr"><div class="sec-title">MOTIVACE</div></div>
+    <div class="motiv">
+      <div class="motiv-card reward" onclick="openRP('reward')">
+        <span class="mc-icon">🏆</span>
+        <div class="mc-tag">ODMĚNA</div>
+        <div class="mc-val" id="rv"></div>
+        <span class="mc-edit" onclick="event.stopPropagation();openRP('reward')">EDIT</span>
+      </div>
+      <div class="motiv-card punish" onclick="openRP('punish')">
+        <span class="mc-icon">💀</span>
+        <div class="mc-tag">TREST</div>
+        <div class="mc-val" id="pv"></div>
+        <span class="mc-edit" onclick="event.stopPropagation();openRP('punish')">EDIT</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ TAB: NÁVYKY ══ -->
+  <div class="panel" id="panel-navyky">
+    <div class="sec-hdr">
+      <div class="sec-title">NÁVYKY</div>
+      <button class="add-btn" style="margin:0;width:auto;padding:7px 14px;font-size:.5rem;" onclick="openItem()">+ PŘIDAT</button>
+    </div>
+    <div class="clist" id="nav-list"></div>
+  </div>
+
+  <!-- ══ TAB: LOG ══ -->
+  <div class="panel" id="panel-log">
+    <div class="sec-hdr">
+      <div class="sec-title">DENNÍ LOG</div>
+      <div class="date-nav">
+        <button class="dnav-btn" id="prev-j" onclick="navJ(-1)">←</button>
+        <div class="dnav-date" id="nav-j">DNES</div>
+        <button class="dnav-btn" id="next-j" onclick="navJ(1)" disabled>→</button>
+      </div>
+    </div>
+    <div class="jblock">
+      <div class="jlbl win">✅ CO SE POVEDLO</div>
+      <textarea class="jta" id="j-win" placeholder="Výhry, progres, momenty hrdosti..."></textarea>
+    </div>
+    <div class="jblock">
+      <div class="jlbl fail">❌ CO SE NEPOVEDLO</div>
+      <textarea class="jta" id="j-fail" placeholder="Kde jsem selhal? Co příště jinak?"></textarea>
+    </div>
+    <div class="jblock">
+      <div class="jlbl ref">💡 REFLEXE</div>
+      <textarea class="jta" id="j-ref" placeholder="Myšlenky, insight, nápady..."></textarea>
+    </div>
+    <button class="jsave" onclick="saveJ()">ULOŽIT LOG →</button>
+
+    <div class="sec-hdr"><div class="sec-title">ARCHIV ZÁZNAMŮ</div></div>
+    <div id="arc"></div>
+  </div>
+
+  <!-- ══ TAB: HUD / PŘEHLED ══ -->
+  <div class="panel" id="panel-prehled">
+    <div class="sec-hdr" style="margin-bottom:12px;"><div class="sec-title">90 DNÍ — MŘÍŽKA</div></div>
+    <div class="grid90" id="grid90"></div>
+    <div class="legend">
+      <div class="leg"><span class="ldot" style="background:rgba(0,255,136,.3);border:1px solid rgba(0,255,136,.5);"></span>SPLNĚNO</div>
+      <div class="leg"><span class="ldot" style="background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.2);"></span>ČÁSTI</div>
+      <div class="leg"><span class="ldot" style="background:rgba(255,51,102,.1);border:1px solid rgba(255,51,102,.2);"></span>FAIL</div>
+      <div class="leg"><span class="ldot" style="border:1px solid var(--cyan);box-shadow:0 0 5px rgba(0,238,255,.4);"></span>DNES</div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<!-- MODAL: item -->
+<div class="moverlay" id="item-modal">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle cyan" id="item-title">NOVÁ POLOŽKA</div>
+    <div class="fg">
+      <label class="flbl">NÁZEV</label>
+      <input type="text" class="finput" id="item-name" placeholder="Co chceš splnit?">
+    </div>
+    <div class="fg">
+      <label class="flbl">KATEGORIE</label>
+      <select class="fselect" id="item-cat">
+        <option value="sport">💪 Sport / Trénink</option>
+        <option value="prace">💻 Práce / Produktivita</option>
+        <option value="self">🧠 Self Progress</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label class="flbl">PROČ? (volitelné)</label>
+      <textarea class="ftextarea" id="item-why" placeholder="Důvod proč ti na tom záleží..." style="min-height:64px;"></textarea>
+    </div>
+    <div class="macts">
+      <button class="mbtn-s" onclick="closeM('item-modal')">ZRUŠIT</button>
+      <button class="mbtn-p" onclick="saveItem()">ULOŽIT</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: reward/punish -->
+<div class="moverlay" id="rp-modal">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle" id="rp-title">ODMĚNA</div>
+    <div class="fg">
+      <label class="flbl" id="rp-lbl">POPIS</label>
+      <textarea class="ftextarea" id="rp-inp" style="min-height:90px;"></textarea>
+    </div>
+    <div class="macts">
+      <button class="mbtn-s" onclick="closeM('rp-modal')">ZRUŠIT</button>
+      <button class="mbtn-p" onclick="saveRP()">ULOŽIT</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<style>
+/* ── RULES / DESATERO ── */
+.rules-block { margin-bottom:20px; display:flex; flex-direction:column; gap:6px; }
+
+.rule-item {
+  display:flex; align-items:center; gap:12px;
+  border-radius:11px; padding:11px 14px;
+}
+.rule-item.do {
+  background:rgba(0,255,136,.05); border:1px solid rgba(0,255,136,.15);
+}
+.rule-item.dont {
+  background:rgba(255,51,102,.05); border:1px solid rgba(255,51,102,.15);
+}
+.rule-icon { font-size:1rem; flex-shrink:0; }
+.rule-name { font-size:.9rem; font-weight:600; color:#eef0ff !important; }
+
+/* ── FORCE READABLE COLORS (light mode fix) ── */
+body { color-scheme: dark; }
+input, select, textarea { color-scheme: dark; }
+.finput, .fselect, .ftextarea, .jta {
+  color: #eef0ff !important;
+  background: rgba(255,255,255,0.06) !important;
+}
+.ci-name { color: #eef0ff !important; }
+.ci.done .ci-name { color: #40486a !important; }
+.mc-val { color: #eef0ff !important; }
+.arc-day { color: #8890bb !important; }
+
+/* filter buttons */
+.filter-btn {
+  font-family:var(--hud); font-size:.5rem; letter-spacing:1.5px;
+  padding:6px 12px; border-radius:7px; cursor:pointer;
+  background:var(--s1); border:1px solid var(--b1); color:var(--t3);
+  transition:all .15s;
+}
+.filter-btn.on { background:rgba(0,238,255,.08); border-color:rgba(0,238,255,.3); color:var(--cyan); }
+</style>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────
+let S = {
+  start: null,
+  rules: [
+    {id:'r1', type:'do',   name:'50 kliků'},
+    {id:'r2', type:'do',   name:'50 dřepů'},
+    {id:'r3', type:'do',   name:'1 minuta plank'},
+    {id:'r4', type:'do',   name:'10 stran knihy'},
+    {id:'r5', type:'do',   name:'10 min vizualizace'},
+    {id:'r6', type:'do',   name:'30 min práce na Nexe'},
+    {id:'r7', type:'dont', name:'Žádný YouTube'},
+    {id:'r8', type:'dont', name:'Žádný Instagram / TikTok'},
+    {id:'r9', type:'dont', name:'Žádné porno'},
+    {id:'r10',type:'dont', name:'Žádné hry'},
+    {id:'r11',type:'dont', name:'Žádné návykové látky'},
+  ],
+  items: [
+    {id:'h1', name:'50 kliků',             cat:'sport', why:'Síla a konzistence.'},
+    {id:'h2', name:'50 dřepů',             cat:'sport', why:'Fyzická disciplína každý den.'},
+    {id:'h3', name:'1 minuta plank',       cat:'sport', why:'Core síla a mentální odolnost.'},
+    {id:'h4', name:'10 stran knihy',       cat:'self',  why:'Každý den se vzdělávám.'},
+    {id:'h5', name:'10 min vizualizace',   cat:'self',  why:'Mentální trénink — vidím cíl každý den jasně.'},
+    {id:'h6', name:'30 min práce na Nexe', cat:'prace', why:'Startup se buduje každý den, i když nechci.'},
+  ],
+  log: {},
+  journal: {},
+  reward: 'Odlet na rok do USA 🇺🇸',
+  punish: '300 kliků + 300 dřepů + 5 min plank + restart výzvy od nuly 💀',
+};
+let viewD = null;   // null = today
+let viewJ = null;
+let editId = null;
+let rpMode = null;
+let filterCat = 'all';
+
+const CAT = {
+  sport: { label:'💪 SPORT',   cls:'cat-sport' },
+  prace: { label:'💻 PRÁCE',   cls:'cat-prace' },
+  self:  { label:'🧠 SELF',    cls:'cat-self'  },
+};
+
+// ── STORAGE ────────────────────────────────────────────────────
+function save() {
+  (async()=>{
+    try { await window.storage.set('c90_v5', JSON.stringify(S)); } catch(e) {
+      try { localStorage.setItem('c90_v5', JSON.stringify(S)); } catch(e2) {}
+    }
+  })();
+}
+
+async function load() {
+  try {
+    const r = await window.storage.get('c90_v5');
+    if (r && r.value) S = {...S, ...JSON.parse(r.value)};
+  } catch(e) {
+    try { const r=localStorage.getItem('c90_v5'); if(r) S={...S,...JSON.parse(r)}; } catch(e2) {}
+  }
+  if (!S.start) S.start = td();
+  render();
+}
+
+// ── DATE UTILS ─────────────────────────────────────────────────
+function td() { return new Date().toISOString().slice(0,10); }
+function addD(d,n) { const x=new Date(d); x.setDate(x.getDate()+n); return x.toISOString().slice(0,10); }
+function diff(a,b) { return Math.round((new Date(b)-new Date(a))/86400000); }
+function fmtShort(d) { return new Date(d+'T00:00:00').toLocaleDateString('cs-CZ',{day:'numeric',month:'short'}); }
+function fmtLong(d)  { return new Date(d+'T00:00:00').toLocaleDateString('cs-CZ',{weekday:'short',day:'numeric',month:'long'}); }
+function getVD() { return viewD||td(); }
+function getVJ() { return viewJ||td(); }
+function dayNum(d) { return Math.max(1, diff(S.start,d)+1); }
+function pad(n) { return String(n).padStart(2,'0'); }
+
+// ── SCORES ─────────────────────────────────────────────────────
+function dayScore(d) {
+  const l=S.log[d]||{}, tot=S.items.length;
+  if(!tot) return {done:0,tot:0,pct:0};
+  const done=S.items.filter(i=>l[i.id]).length;
+  return {done,tot,pct:done/tot};
+}
+function streak() {
+  let s=0, d=addD(td(),-1);
+  const ts=dayScore(td());
+  if(ts.tot&&ts.done===ts.tot) s=1;
+  while(true){ if(dayNum(d)<1)break; const sc=dayScore(d); if(!sc.tot||sc.pct<1)break; s++;d=addD(d,-1); }
+  return s;
+}
+function perfDays() {
+  let c=0;
+  for(let i=0;i<90;i++){ const d=addD(S.start,i); if(d>td())break; const s=dayScore(d); if(s.tot&&s.pct===1)c++; }
+  return c;
+}
+
+// ── RENDER ─────────────────────────────────────────────────────
+function render() {
+  const t=td(), dn=dayNum(t);
+  const cPct = Math.min(100,((dn-1)/89)*100);
+  const ts = dayScore(t);
+  const tPct = ts.tot ? Math.round(ts.pct*100) : 0;
+
+  document.getElementById('hdr-date').textContent =
+    new Date(t+'T00:00:00').toLocaleDateString('cs-CZ',{weekday:'long',day:'numeric',month:'long'}).toUpperCase();
+
+  document.getElementById('day-num').textContent = pad(Math.min(dn,90));
+  document.getElementById('bar-fill').style.width = cPct+'%';
+  document.getElementById('bar-pct').textContent = Math.round(cPct)+'%';
+
+  const circ=238.76;
+  document.getElementById('ring-fill').style.strokeDashoffset = circ-(ts.pct*circ);
+  document.getElementById('ring-pct').textContent = tPct+'%';
+
+  document.getElementById('st-streak').textContent = streak();
+  document.getElementById('st-perf').textContent   = perfDays();
+  document.getElementById('st-rem').textContent    = Math.max(0,90-dn+1);
+
+  renderRules();
+  renderNavList();
+  renderJ();
+  renderGrid();
+  renderRP();
+  document.getElementById('start-inp').value = S.start;
+}
+
+function renderRules() {
+  const doEl   = document.getElementById('rules-do');
+  const dontEl = document.getElementById('rules-dont');
+  if(!doEl||!dontEl) return;
+  const doItems   = (S.rules||[]).filter(r=>r.type==='do');
+  const dontItems = (S.rules||[]).filter(r=>r.type==='dont');
+  doEl.innerHTML = doItems.map((r,i)=>
+    `<div class="rule-item do"><span class="rule-icon">✦</span><span class="rule-name">${i+1}. ${r.name}</span></div>`
+  ).join('');
+  dontEl.innerHTML = dontItems.map((r,i)=>
+    `<div class="rule-item dont"><span class="rule-icon">✕</span><span class="rule-name">${r.name}</span></div>`
+  ).join('');
+}
+
+function renderList() {
+  const d = getVD();
+  const isT = d===td();
+  document.getElementById('nav-d').textContent = isT?'DNES':fmtShort(d).toUpperCase();
+  document.getElementById('prev-d').disabled = dayNum(d)<=1;
+  document.getElementById('next-d').disabled = isT;
+
+  const el = document.getElementById('main-list');
+  if(!S.items.length) { el.innerHTML=`<div class="empty"><span class="eico">◈</span>ŽÁDNÉ NÁVYKY — PŘIDEJ NA TABU NÁVYKY</div>`; return; }
+
+  const l = S.log[d]||{};
+  el.innerHTML = S.items.map(item => itemHTML(item, !!l[item.id], d, 'toggle')).join('');
+}
+
+function renderNavList() {
+  const el = document.getElementById('nav-list');
+  if(!S.items.length) { el.innerHTML=`<div class="empty"><span class="eico">◈</span>ŽÁDNÉ NÁVYKY</div>`; return; }
+  const l = S.log[td()]||{};
+  el.innerHTML = S.items.map(item => itemHTML(item, !!l[item.id], td(), 'toggle')).join('');
+}
+
+function itemHTML(item, done, date, toggleFn) {
+  const cat = CAT[item.cat]||CAT.self;
+  const whyHtml = item.why ? `<div class="ci-reason">↳ ${item.why}</div>` : '';
+  return `<div class="ci ${done?'done':''}">
+    <div class="ci-check" onclick="${toggleFn}('${item.id}','${date}')">
+      <div class="ci-box">${done?'✓':''}</div>
+    </div>
+    <div class="ci-body" onclick="${toggleFn}('${item.id}','${date}')">
+      <div class="ci-name">${item.name}</div>
+      <div class="ci-cat ${cat.cls}">${cat.label}</div>
+      ${whyHtml}
+    </div>
+    <div class="ci-acts">
+      <button class="ci-btn edt" onclick="editItem('${item.id}')">✏</button>
+      <button class="ci-btn del" onclick="delItem('${item.id}')">✕</button>
+    </div>
+  </div>`;
+}
+
+function renderJ() {
+  const d = getVJ();
+  const isT = d===td();
+  document.getElementById('nav-j').textContent = isT?'DNES':fmtShort(d).toUpperCase();
+  document.getElementById('prev-j').disabled = dayNum(d)<=1;
+  document.getElementById('next-j').disabled = isT;
+  const j = S.journal[d]||{};
+  document.getElementById('j-win').value  = j.win||'';
+  document.getElementById('j-fail').value = j.fail||'';
+  document.getElementById('j-ref').value  = j.ref||'';
+
+  const arc = document.getElementById('arc');
+  const entries = Object.entries(S.journal)
+    .filter(([,j])=>j.win||j.fail||j.ref)
+    .sort(([a],[b])=>b.localeCompare(a)).slice(0,15);
+  if(!entries.length){ arc.innerHTML=`<div class="empty"><span class="eico">✍</span>ŽÁDNÉ ZÁZNAMY</div>`; return; }
+  arc.innerHTML = entries.map(([d,j])=>`
+    <div class="arc-entry">
+      <div class="arc-day">DEN ${pad(dayNum(d))} — ${fmtLong(d).toUpperCase()}</div>
+      ${j.win  ? `<div class="arc-line" style="color:var(--green);">✅ ${j.win}</div>` : ''}
+      ${j.fail ? `<div class="arc-line" style="color:var(--red);">❌ ${j.fail}</div>` : ''}
+      ${j.ref  ? `<div class="arc-line" style="color:var(--blue);">💡 ${j.ref}</div>` : ''}
+    </div>`).join('');
+}
+
+function renderGrid() {
+  const g = document.getElementById('grid90'); g.innerHTML='';
+  for(let i=0;i<90;i++){
+    const d=addD(S.start,i), s=dayScore(d);
+    const isFut=d>td(), isTod=d===td();
+    const cls=isFut?'future':isTod?'today':s.tot===0?'':s.pct===1?'full':s.pct>=.5?'partial':'fail';
+    const c=document.createElement('div');
+    c.className=`dc ${cls}`; c.textContent=pad(i+1);
+    c.title=fmtShort(d)+(s.tot?` (${s.done}/${s.tot})`:'');
+    g.appendChild(c);
+  }
+}
+
+function renderRP() {
+  const rv=document.getElementById('rv'), pv=document.getElementById('pv');
+  rv.className='mc-val'+(S.reward?'':' empty'); rv.textContent=S.reward||'Klikni a nastav odměnu...';
+  pv.className='mc-val'+(S.punish?'':' empty'); pv.textContent=S.punish||'Klikni a nastav trest...';
+}
+
+// ── TABS ───────────────────────────────────────────────────────
+function tab(name) {
+  const names=['dnes','navyky','log','prehled'];
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('on',names[i]===name));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.id===`panel-${name}`));
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────
+function navDay(delta) {
+  const cur=getVD(), next=addD(cur,delta);
+  if(dayNum(next)<1||next>td()) return;
+  viewD=next===td()?null:next; render();
+}
+function navJ(delta) {
+  const cur=getVJ(), next=addD(cur,delta);
+  if(dayNum(next)<1||next>td()) return;
+  viewJ=next===td()?null:next; renderJ();
+}
+
+// ── TOGGLE ─────────────────────────────────────────────────────
+function toggle(id, d) {
+  if(!S.log[d]) S.log[d]={};
+  S.log[d][id]=!S.log[d][id];
+  save(); render();
+  if(S.log[d][id]) toast('SPLNĚNO ✓');
+}
+
+// ── ITEM CRUD ─────────────────────────────────────────────────
+function openItem(id=null) {
+  editId=id;
+  const item=id?S.items.find(x=>x.id===id):null;
+  document.getElementById('item-title').textContent=id?'UPRAVIT POLOŽKU':'NOVÁ POLOŽKA';
+  document.getElementById('item-name').value=item?.name||'';
+  document.getElementById('item-cat').value=item?.cat||'sport';
+  document.getElementById('item-why').value=item?.why||'';
+  openM('item-modal');
+  setTimeout(()=>document.getElementById('item-name').focus(),150);
+}
+function editItem(id) { openItem(id); }
+function saveItem() {
+  const name=document.getElementById('item-name').value.trim();
+  const cat=document.getElementById('item-cat').value;
+  const why=document.getElementById('item-why').value.trim();
+  if(!name) return;
+  if(editId) {
+    const item=S.items.find(x=>x.id===editId);
+    if(item){item.name=name;item.cat=cat;item.why=why;}
+  } else {
+    S.items.push({id:Date.now().toString(),name,cat,why});
+  }
+  save(); closeM('item-modal'); render();
+  toast(editId?'UPRAVENO ✓':'PŘIDÁNO ✓');
+}
+function delItem(id) {
+  if(!confirm('Smazat položku?')) return;
+  S.items=S.items.filter(x=>x.id!==id);
+  save(); render(); toast('SMAZÁNO');
+}
+
+// ── FILTER ────────────────────────────────────────────────────
+function setFilter(cat) {
+  filterCat=cat;
+  document.querySelectorAll('.filter-btn').forEach(b=>{
+    b.classList.toggle('on', b.textContent.toLowerCase().includes(cat)||cat==='all'&&b.textContent==='VŠE');
+  });
+  renderNavList();
+}
+
+// ── REWARD / PUNISH ───────────────────────────────────────────
+function openRP(mode) {
+  rpMode=mode; const isR=mode==='reward';
+  const t=document.getElementById('rp-title');
+  t.textContent=isR?'ODMĚNA':'TREST';
+  t.className='mtitle '+(isR?'green':'red');
+  document.getElementById('rp-lbl').textContent=isR?'CO DOSTANEŠ ZA SPLNĚNÍ 90 DNÍ':'CO TĚ ČEKÁ ZA SELHÁNÍ';
+  document.getElementById('rp-inp').value=isR?(S.reward||''):(S.punish||'');
+  document.getElementById('rp-inp').placeholder=isR?'Nová věc, dovolená, zážitek...':'Platba kamarádovi, veřejné přiznání...';
+  openM('rp-modal');
+  setTimeout(()=>document.getElementById('rp-inp').focus(),150);
+}
+function saveRP() {
+  const val=document.getElementById('rp-inp').value.trim();
+  if(rpMode==='reward') S.reward=val; else S.punish=val;
+  save(); closeM('rp-modal'); renderRP();
+  toast(rpMode==='reward'?'ODMĚNA ULOŽENA 🏆':'TREST ULOŽEN 💀');
+}
+
+// ── JOURNAL ───────────────────────────────────────────────────
+function saveJ() {
+  const d=getVJ();
+  const win=document.getElementById('j-win').value.trim();
+  const fail=document.getElementById('j-fail').value.trim();
+  const ref=document.getElementById('j-ref').value.trim();
+  if(!win&&!fail&&!ref) return;
+  S.journal[d]={win,fail,ref};
+  save(); renderJ(); toast('LOG ULOŽEN ✓');
+}
+
+// ── MODALS ────────────────────────────────────────────────────
+function openM(id) { document.getElementById(id).classList.add('on'); }
+function closeM(id) { document.getElementById(id).classList.remove('on'); editId=null; }
+
+// ── RESET ─────────────────────────────────────────────────────
+function resetAll() {
+  if(!confirm('Smazat vše? Nelze vrátit.')) return;
+  (async()=>{ try{await window.storage.delete('c90_v5');}catch(e){} })();
+  try{localStorage.removeItem('c90_v5');}catch(e){}
+  S={start:td(),items:[],log:{},journal:{},reward:'',punish:''};
+  save(); render(); toast('RESET DOKONČEN');
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function toast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'),2200);
+}
+
+// ── EVENTS ────────────────────────────────────────────────────
+document.getElementById('set-btn').onclick=()=>document.getElementById('settings').classList.toggle('on');
+document.getElementById('start-inp').onchange=e=>{S.start=e.target.value;save();render();};
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeM('item-modal');closeM('rp-modal');}
+  if(e.key==='Enter'&&document.getElementById('item-modal').classList.contains('on')) saveItem();
+});
+['item-modal','rp-modal'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',e=>{
+    if(e.target===document.getElementById(id)) closeM(id);
+  });
+});
+
+// ── INIT ──────────────────────────────────────────────────────
+load();
+</script>
+</body>
+</html>
